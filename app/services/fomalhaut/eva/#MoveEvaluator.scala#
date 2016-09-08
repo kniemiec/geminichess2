@@ -1,0 +1,249 @@
+package fomalhaut.eva
+
+import fomalhaut.helper.MoveLogger
+import fomalhaut._
+import fomalhaut.pieces.BoardTestHelper
+
+object MoveEvaluator {
+  
+  val MAX_DEPTH : Int = 5
+
+  var bestPathMoves : List[Move] = List[Move]()
+
+  var currentlyAnalyzedPathMoves : List[List[Move]] = List()
+
+  var bestPathMovesMarker : Int = 0
+  
+  def generateBoardsList(board: Board): List[Board] = {
+    board.generateAllReachableBoards()    
+  }
+
+
+  def findBestMove(board: Board): Move = {
+    if(board.getBoardSpecialEvents().getColorToMove() == 0){
+      findBestWhiteMove(board)
+    } else {
+      findBestBlackMove(board)
+    }
+  }
+
+  def findBestWhiteMove(board: Board): Move = {
+    val movesList: List[Move] = board.getAllMoves()
+    assert(!movesList.isEmpty)
+      var maxValues = -2000000
+
+      var moveFound = movesList(1)
+      for (move <- movesList) {
+        MoveLogger.logMove(move)
+        val evaluated = evaluateMoveForWhite(board, move, MAX_DEPTH - 1)
+        if (evaluated > maxValues) {
+          maxValues = evaluated
+          moveFound = move
+          pushMove(move,MAX_DEPTH)
+          //        MoveLogger.logMove(move,maxValues)
+        }
+      }
+      println("finished")
+      MoveLogger.printPathEvaluation(bestPathMoves, maxValues)
+      moveFound
+  }
+
+  def findBestBlackMove(board: Board): Move = {
+    val movesList : List[Move] = board.getAllMoves()
+    assert(!movesList.isEmpty)
+    
+    BoardTestHelper.printList(movesList)
+    var maxValues = 2000000
+    var moveFound = movesList(1)
+    for(move <- movesList){
+      MoveLogger.logMove(move)
+      val evaluated = evaluateMoveForBlack(board, move, MAX_DEPTH-1)
+      if(evaluated < maxValues){
+        maxValues = evaluated
+        moveFound = move
+        pushMove(move,MAX_DEPTH)
+        //        MoveLogger.logMove(move,maxValues)
+      }
+    }
+    println("finished")
+    MoveLogger.printPathEvaluation(bestPathMoves, maxValues)
+    moveFound
+  }
+
+  def evaluateMoveForBlack(board: Board, move: Move, depth : Int): Int = {
+    val newBoard : Board = board.generateBoardAfterMove(move)
+    return findMaxValue(newBoard,depth)
+  }
+
+  def evaluateMoveForWhite(board: Board, move: Move, depth : Int): Int = {
+    val newBoard : Board = board.generateBoardAfterMove(move)
+    return findMinValue(newBoard,depth)
+  }
+
+  def findMaxValue(board: Board, depth: Int) : Int = {
+    if(board.isKingMated()){
+      clearMovesPath(depth)
+      (depth + 1) * 200000
+    } else if(depth == 0){
+        BoardValueCalculator.calculateBoardValue(board)
+    } else {
+        var maxValue = -200000
+        val movesList : List[Move] = board.getAllMoves()
+        if(movesList.isEmpty){
+          if(board.isWhiteKingAttacked()) maxValue =  -1*(depth+1)*200000
+          else maxValue = 0
+        } else { 
+          for(move <- movesList){
+            val newBoard : Board = board.generateBoardAfterMove(move)
+            val score = findMinValue(newBoard,depth-1)
+            if(score > maxValue){
+              pushMove(move,depth)
+              maxValue = score
+            }
+          }
+        }
+        maxValue
+    }
+  }
+
+
+  def findMinValue(board: Board, depth: Int) : Int = {
+    if(board.isKingMated()){
+      clearMovesPath(depth)
+      -1*(depth + 1) * 200000
+    } else if(depth == 0){
+      BoardValueCalculator.calculateBoardValue(board)
+    } else {
+        var minValue : Int = 200000
+        val movesList : List[Move] = board.getAllMoves()
+        if(movesList.isEmpty) {
+          if(board.isBlackKingAttacked()) minValue = (depth+1)*200000
+          else minValue = 0
+        } else {
+          for(move <- movesList){
+             val newBoard : Board = board.generateBoardAfterMove(move)
+  
+            val score : Int = findMaxValue(newBoard,depth-1)
+            if(score < minValue){
+              pushMove(move,depth)
+              minValue = score
+            }
+          }
+        }
+        minValue
+    }
+  }
+
+  def initalizeList(depth: Int): List[List[Move]] = {
+      if(depth > 0) { 
+         List[Move]() :: initalizeList(depth-1) 
+      } else {
+        List[List[Move]]()
+      }
+      
+  }
+
+
+  def pushMove(move: Move, depth: Int) = {
+    if(currentlyAnalyzedPathMoves.isEmpty) {
+//      currentlyAnalyzedPathMoves = List[Move]() :: initalizeList(MAX_DEPTH-1)
+      currentlyAnalyzedPathMoves = List[List[Move]]()
+    }
+    if (depth == MAX_DEPTH) {
+      val top : List[Move] = move :: currentlyAnalyzedPathMoves.tail.head // second element
+      currentlyAnalyzedPathMoves = top :: currentlyAnalyzedPathMoves.tail
+      copyCurrentToBest()
+    } else {
+      currentlyAnalyzedPathMoves = currentlyAnalyzedPathMoves.head :: pushInternal(currentlyAnalyzedPathMoves.tail, move,depth,1)
+    }
+  }
+
+  def cutOffPath(depth: Int, i: Int, path: List[List[Move]] ): List[List[Move]] = {
+    if(path.size == 1){
+      List[List[Move]]()
+    } else  if(depth > i){
+      List[Move]() :: cutOffPath(depth, i-1, path.tail)
+    } else {
+      path.head :: cutOffPath(depth, i-1, path.tail)
+    }
+  }
+
+  def clearMovesPath(depth: Int) = {
+//    println(currentlyAnalyzedPathMoves)
+    if(!currentlyAnalyzedPathMoves.isEmpty)  currentlyAnalyzedPathMoves = cutOffPath(depth, MAX_DEPTH-1, currentlyAnalyzedPathMoves)
+    println(currentlyAnalyzedPathMoves)
+  }
+
+
+    def pushInternal(paths: List[List[Move]], move: Move, depth: Int, marker: Int) : List[List[Move]] = {
+      if(paths.size == 1){
+        val moveList : List[Move] = move :: List[Move]()
+        moveList :: List[List[Move]]()
+      } else if(paths.size == depth){
+         // we found base to rewrite
+        val soruceVariant : List[Move] = move :: paths.tail.head
+        soruceVariant :: paths.tail
+      } else {
+        paths.head :: pushInternal(paths.tail, move, depth, marker+1)
+      }
+//      if(marker == 1){
+//        currentlyAnalyzedPathMoves(marker-1)(MAX_DEPTH-depth) = move
+//      } else if(depth == marker){
+//        currentlyAnalyzedPathMoves(marker-2)(MAX_DEPTH-depth) = move
+//        rewritePath(marker-2, marker-1, marker-1)
+//      } else {
+//        pushInternal(move, depth, marker-1)
+//      }
+//      return 0
+    }
+
+//  def rewritePath(fromDepth: Int, toDepth: Int, amount : Int)= {
+//    for(i: Int <- 0 to amount){
+//      currentlyAnalyzedPathMoves(toDepth)(MAX_DEPTH-i-1) =
+//        currentlyAnalyzedPathMoves(fromDepth)(MAX_DEPTH-i-1)
+//    }
+//  }
+
+  def copyCurrentToBest() = {
+    bestPathMoves = currentlyAnalyzedPathMoves.head
+  }
+
+
+//    def pushMove(move: Move, depth: Int) = {
+//    if (depth == MAX_DEPTH) {
+//      currentlyAnalyzedPathMoves(MAX_DEPTH-2)(MAX_DEPTH - depth) = move
+//      rewritePath(MAX_DEPTH-2, MAX_DEPTH-1, MAX_DEPTH-1)
+//      copyCurrentToBest()
+//    } else {
+//      pushInternal(move,depth,MAX_DEPTH-1)
+//
+//    }
+//  }
+//
+//    def pushInternal(move: Move, depth: Int, marker: Int) : Int = {
+//      if(marker == 1){
+//        currentlyAnalyzedPathMoves(marker-1)(MAX_DEPTH-depth) = move
+//      } else if(depth == marker){
+//        currentlyAnalyzedPathMoves(marker-2)(MAX_DEPTH-depth) = move
+//        rewritePath(marker-2, marker-1, marker-1)
+//      } else {
+//        pushInternal(move, depth, marker-1)
+//      }
+//      return 0
+//    }
+//
+//  def rewritePath(fromDepth: Int, toDepth: Int, amount : Int)= {
+//    for(i: Int <- 0 to amount){
+//      currentlyAnalyzedPathMoves(toDepth)(MAX_DEPTH-i-1) =
+//        currentlyAnalyzedPathMoves(fromDepth)(MAX_DEPTH-i-1)
+//    }
+//  }
+//
+//  def copyCurrentToBest() = {
+//    for(i: Int <- 0 until MAX_DEPTH){
+//      bestPathMoves(i) = currentlyAnalyzedPathMoves(MAX_DEPTH-1)(i)
+//    }
+//  }
+
+
+}
