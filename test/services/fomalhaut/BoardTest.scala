@@ -485,10 +485,10 @@ class BoardTest extends FlatSpec{
 
 
  "An almost initial position " should " give such list of Moves" in {
-    val board: Board = FENParser.parseFENDescriptiontToBoard("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1")
-    BoardTestHelper.printList(board.getAllMoves())
-    assert(BoardTestHelper.compareUnnormalizedLists(board.getAllMoves() ,BOARD_WITH_INTERCHECK))
-  }
+   val board: Board = FENParser.parseFENDescriptiontToBoard("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1")
+   BoardTestHelper.printList(board.getAllMoves())
+   assert(BoardTestHelper.compareUnnormalizedLists(board.getAllMoves(), BOARD_WITH_INTERCHECK))
+ }
 
  "White castling position " should " give castling allowed for both sides" in {
     val board: Board = FENParser.parseFENDescriptiontToBoard("rnbqkbnr/pppppppp/8/8/8/8/P6P/R3K2R w KQkq - 0 1")
@@ -554,14 +554,14 @@ class BoardTest extends FlatSpec{
   }
 
  "initial boards " should " generate 20 new positions " in {
-    val board: Board = FENParser.parseFENDescriptiontToBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq 43 0 1")
+    val board: Board = FENParser.parseFENDescriptiontToBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     val allPossibleBoards : List[Board] = board.generateAllReachableBoards()
 
     assert(allPossibleBoards.size == 20)
   }
 
   "pawn promotion " should " generate 9 new positions " in {
-    val board: Board = FENParser.parseFENDescriptiontToBoard("8/7P/8/8/8/7K/k7/8 w - 0 0 1")
+    val board: Board = FENParser.parseFENDescriptiontToBoard("8/7P/8/8/8/7K/k7/8 w - - 0 1")
     val allPossibleBoards : List[Board] = board.generateAllReachableBoards()
     assert(allPossibleBoards.size == 9)
   }
@@ -580,14 +580,14 @@ class BoardTest extends FlatSpec{
   }
 
   "position after move Xk " should " be like " in {
-    val initialPosition: Board = FENParser.parseFENDescriptiontToBoard("8/8/8/8/2K5/7R/1k5R/8 w - 43 0 1")
+    val initialPosition: Board = FENParser.parseFENDescriptiontToBoard("8/8/8/8/2K5/7R/1k5R/8 w - - 0 1")
     BoardTestHelper.printBoard(initialPosition)
     val newBoard: Board = initialPosition.generateBoardAfterMove(new Move(15, 9, PieceType.ROOK, PieceType.ROOK))
     BoardTestHelper.printBoard(newBoard)
   }
 
   "in this position black king " should " be attacked " in {
-     val board: Board = FENParser.parseFENDescriptiontToBoard("k7/1P6/1K6/8/8/6B1/5p2/8 b - 43 0 1")
+     val board: Board = FENParser.parseFENDescriptiontToBoard("k7/1P6/1K6/8/8/6B1/5p2/8 b - - 0 1")
      BoardTestHelper.printBoard(board)
      assert(board.isBlackKingAttacked())
   }

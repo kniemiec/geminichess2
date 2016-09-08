@@ -127,13 +127,13 @@ object FENParser {
 
   def convertFromField(field: String): Integer= {
     val row : Int = field.charAt(0).toInt-97
-    val line : Int = field.substring(1).toInt
+    val line : Int = field.substring(1).toInt-1
     line*8+row
   }
 
   def convertToField(move: Int): String = {
     val row : Int = move % 8 + 97
-    val line : Int = move / 8
+    val line : Int = (move / 8) + 1
     row.asInstanceOf[Char]+line.toString
   }
 
