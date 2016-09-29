@@ -18,21 +18,21 @@ class CommantInterfaceTest extends FlatSpec{
   }
 
 
-  "Move Sg1f3 " should " be valid " in {
-    val resultMove: Move = MoveConverter.validateCommand("Sg1f3")
+  "Move Ng1f3 " should " be valid " in {
+    val resultMove: Move = MoveConverter.validateCommand("Ng1f3")
     BoardTestHelper.printMove(resultMove)
     assert(resultMove.equals(new Move(6,21,PieceType.KNIGHT,PieceType.KNIGHT)))
   }
 
-  "Move Gf1a6 " should " be valid " in {
-    val resultMove: Move = MoveConverter.validateCommand("Gf1a6")
+  "Move Bf1a6 " should " be valid " in {
+    val resultMove: Move = MoveConverter.validateCommand("Bf1a6")
     BoardTestHelper.printMove(resultMove)
     assert(resultMove.equals(new Move(5,40,PieceType.BISHOP,PieceType.BISHOP)))
   }
 
 
-  "Move Sg8f6 " should " be valid " in {
-    val resultMove: Move = MoveConverter.validateCommand("Sg8f6")
+  "Move Ng8f6 " should " be valid " in {
+    val resultMove: Move = MoveConverter.validateCommand("Ng8f6")
     BoardTestHelper.printMove(resultMove)
     assert(resultMove.equals(new Move(62,45,PieceType.KNIGHT,PieceType.KNIGHT)))
   }
@@ -45,8 +45,8 @@ class CommantInterfaceTest extends FlatSpec{
 //    assert(resultMove.equals(new Move(51,59,PieceType.PAWN,PieceType.QEEN)))
   }
 
-  "Move d7d8H " should " is valid promotion move" in {
-    val resultMove: Move = MoveConverter.validateCommand("d7d8H")
+  "Move d7d8Q " should " is valid promotion move" in {
+    val resultMove: Move = MoveConverter.validateCommand("d7d8Q")
     BoardTestHelper.printMove(resultMove)
     assert(resultMove.equals(new Move(51,59,PieceType.PAWN,PieceType.QEEN)))
   }

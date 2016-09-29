@@ -1,6 +1,8 @@
 package services.fomalhaut.helper
 
 import services.fomalhaut.Move
+import services.fomalhaut.pieces.PieceType
+import services.fomalhaut.pieces.PieceType.PieceType
 
 /**
  * Created by kniemiec on 06.01.16.
@@ -25,13 +27,26 @@ object MoveLogger {
     println(columnsList(colFrom).toString()+rowFrom.toString+":"+columnsList(colTo).toString()+rowTo.toString())
   }
 
+  def getFigureSymbol(who: PieceType) : String = who match{
+      case PieceType.KNIGHT  => "N"
+      case PieceType.KING => "K"
+      case PieceType.BISHOP => "B"
+      case PieceType.QEEN => "Q"
+      case PieceType.ROOK => "R"
+      case _ => ""
+  }
+
   def convertToMove(move: Move): String = {
     val colFrom = move.from % 8
     val rowFrom = move.from / 8 + 1
     val colTo = move.to % 8
     val rowTo = move.to / 8 + 1
-    columnsList(colFrom).toString()+rowFrom.toString+":"+columnsList(colTo).toString()+rowTo.toString()
+    val result = getFigureSymbol(move.who)+ columnsList(colFrom).toString()+rowFrom.toString+
+        columnsList(colTo).toString()+rowTo.toString() + (if(move.who != move.what) getFigureSymbol(move.what) else "")
+    result
   }
+
+
 
   def printPathEvaluation(moveList: Array[Move], moveValue : Int) = {
     for(move <- moveList if move != null){

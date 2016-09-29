@@ -14,8 +14,13 @@ class Engine(val initialFenData : String) {
 
   val board : Board = FENParser.parseFENDescriptiontToBoard(initialFenData)
 
-  def getResponseMove(userMove: String) = {
-    val move: Move = MoveConverter.convertTextToMove(userMove)
+  def validateMove( move: Move) : Boolean = {
+    val allMoves : List[Move] = board.getAllMoves()
+    allMoves.contains(move)
+  }
+
+  def getResponseMove(move: Move) = {
+
     val newBoard : Board = getBoardAfterUserMove(move)
     val bestMove : Move = MoveEvaluator.findBestMove(newBoard)
     val finalBoard : Board = newBoard.getBoardAfterMove(bestMove)

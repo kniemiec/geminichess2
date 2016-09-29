@@ -5,7 +5,8 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import play.api.libs.json.Json
-import services.fomalhaut.controller.{BoardAction, BoardActionConverter}
+import services.fomalhaut.Move
+import services.fomalhaut.controller.{BoardAction, BoardActionConverter, MoveConverter}
 import services.fomalhaut.controller.BoardAction.BoardAction
 import services.fomalhaut.engine.Engine
 
@@ -55,7 +56,12 @@ class MoveController @Inject() extends Controller {
   private def getEngineMove(fenData : String, userMove: String) : (String, String) = {
     println(s"calculations for position :"+fenData)
     val engine : Engine = new Engine(fenData)
-    engine.getResponseMove(userMove)
+    val move: Move = MoveConverter.convertTextToMove(userMove)
+    if(engine.validateMove(move)) {
+      engine.getResponseMove(move)
+    } else {
+      ( "INVALIDMOVE", fenData)
+    }
 
 //    fen => Ok(Json.obj( "move" ->  getEngineMove(fen,userMove)))
   }

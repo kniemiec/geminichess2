@@ -9,15 +9,15 @@ object MoveConverter {
 
   val ZERO_NUMBER : Int = 49
 
-  val ZERO_LETTER : Int = 97
+  val   ZERO_LETTER : Int = 97
 
   val PIECE_TYPE_MARK : Int = 65
 
-  val QUEEN_NUMBER: Int = 72
+  val QUEEN_NUMBER: Int = 81
   val KING_NUMBER: Int = 75
-  val BISHOP_NUMBER: Int = 71
-  val ROOK_NUMBER: Int = 87
-  val KNIGHT_NUMBER: Int = 83
+  val BISHOP_NUMBER: Int = 66
+  val ROOK_NUMBER: Int = 82
+  val KNIGHT_NUMBER: Int = 78
   val PAWN_NUMBER: Int = 80
 
 
