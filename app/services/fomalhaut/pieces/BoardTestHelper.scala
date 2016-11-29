@@ -48,6 +48,17 @@ object BoardTestHelper {
     printPieceColor(board.getBlackPiecesPosition())
   }
 
+  def getBoardString(board: Board) : String = {
+    var s = "";
+    s = s +"White: "
+    s = s + board.getWhitePiecesPosition().toString()
+    s = s + "Black: "
+    s = s + board.getBlackPiecesPosition().toString()
+    s
+  }
+
+
+
   def printPieceColor(pieces: List[Piece]) = {
     for(piece <- pieces){
       print("Piece: "+piece.getPieceType()+" ")

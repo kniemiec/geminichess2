@@ -30,6 +30,7 @@ class BoardTextRepresentation(board: Board) {
         piece.getPositions().map( (position) => {
           val row : Int = position / 8
           val col : Int = position % 8
+          print(row.toString + " " + col.toString)
           tmpArray(row)(col) = piece.getPieceCode()
         })
       })
@@ -48,6 +49,17 @@ class BoardTextRepresentation(board: Board) {
   private def getFieldColor(r:Int, c:Int): Int = {
     if((r+c) % 2 == 0) { 98  }
     else { 99 }
+  }
+
+  override def toString() = {
+    var result = ""
+    for(i: Int <- 0 until BOARD_SIZE ) {
+      for (j: Int <- 0 until BOARD_SIZE) {
+        result = result + (fieldsArray(BOARD_SIZE - i -1)(j).toChar)
+      }
+      result = result + "\n"
+    }
+    result
   }
 
   def printBoard() = {
