@@ -2,14 +2,11 @@ package controllers
 
 import javax.inject._
 
-import play.api.libs.json.{__, Reads}
+import play.api.libs.json.{Reads, __}
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc._
-
+import play.api.mvc.{Action, Controller}
 import services.fomalhaut.controller.BoardTextRepresentation
-import services.fomalhaut.helper
 import services.fomalhaut.helper.FENParser
-import services.fomalhaut.pieces.BoardTestHelper
 
 @Singleton
 class FenController @Inject() extends Controller {
