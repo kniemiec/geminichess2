@@ -36,7 +36,7 @@ object FENParser {
   //  initializeEmptyBoard(boardContext)
 
     //val figures =
-    val fullFigures  =  piecesPosition(0).map( c => unfoldNumbers(c)).flatten
+    val fullFigures  =  piecesPosition(0).map( c => unfoldNumbers(c)).filter( list => !list.isEmpty).flatten
 //    for((c, index) <- fullFigures.zipWithIndex){
 //      updateBoard(c, index, boardContext)
 //    }

@@ -15,7 +15,7 @@ class FenController @Inject() extends Controller {
 
   def fenToBoard() = Action(parse.json) { implicit request =>
     request.body.validate[FenItem] match {
-      case JsSuccess(fen, _) => Ok(Json.toJson(Json.toJson((new BoardTextRepresentation(FENParser.parseFENDescriptiontToBoard(fen.fen.toString()))).toString())))
+      case JsSuccess(fen, _) => Ok(Json.toJson(Json.toJson((new BoardTextRepresentation(FENParser.parseFENDescriptiontToBoard(fen.fen.toString()))).printBoardAsResponse())))
       case JsError(errors) => BadRequest
     }
 //    Ok(Json.toJson((new BoardTextRepresentation(FENParser.parseFENDescriptiontToBoard(request.body.toString))).toString()))

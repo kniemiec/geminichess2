@@ -19,7 +19,7 @@ case class Knight(mPositions: List[Int], boardContext: BoardSpecialEvents) exten
   }
 
 
-  override def getPieceCode(): Int = 83
+  override def getPieceCode(): Int = 78
 
   override def getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
     for(direction <- movePattern if isValidMove(calculateMoveY(from,direction),calculateMoveX(from,direction)))

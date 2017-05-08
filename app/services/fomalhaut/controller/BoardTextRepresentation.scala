@@ -47,8 +47,8 @@ class BoardTextRepresentation(board: Board) {
   }
 
   private def getFieldColor(r:Int, c:Int): Int = {
-    if((r+c) % 2 == 0) { 98  }
-    else { 99 }
+    if((r+c) % 2 == 0) { 120  }
+    else { 121 }
   }
 
   override def toString() = {
@@ -69,5 +69,15 @@ class BoardTextRepresentation(board: Board) {
       }
       println("")
     }
+  }
+
+  def printBoardAsResponse() = {
+    var result = ""
+    for(i: Int <- 0 until BOARD_SIZE ) {
+      for (j: Int <- 0 until BOARD_SIZE) {
+        result = result + (fieldsArray(BOARD_SIZE - i -1)(j).toChar)
+      }
+    }
+    result
   }
 }

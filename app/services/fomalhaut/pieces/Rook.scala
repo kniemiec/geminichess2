@@ -18,5 +18,5 @@ case class Rook(mPositions: List[Int],boardContext: BoardSpecialEvents) extends 
     PieceType.ROOK
   }
 
-  override def getPieceCode(): Int = 87
+  override def getPieceCode(): Int = 82
 }

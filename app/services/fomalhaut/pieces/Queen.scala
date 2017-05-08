@@ -20,5 +20,5 @@ case class Queen(mPositions: List[Int],boardContext: BoardSpecialEvents) extends
     PieceType.QEEN
   }
 
-  override def getPieceCode(): Int = 72
+  override def getPieceCode(): Int = 81
 }

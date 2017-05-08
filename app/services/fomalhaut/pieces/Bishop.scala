@@ -18,6 +18,6 @@ case class Bishop(mPositions: List[Int], boardContext: BoardSpecialEvents) exten
     PieceType.BISHOP
   }
 
-  override def getPieceCode(): Int = 71
+  override def getPieceCode(): Int = 66
 
 }
