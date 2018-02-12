@@ -1,9 +1,10 @@
 package services.fomalhaut.pieces
 
 import services.fomalhaut.Move
+import services.fomalhaut.fieldAvailability.{MoveValidator, OccupationChecker}
 import services.fomalhaut.pieces.PieceType.PieceType
 
-abstract class Piece {
+trait Piece {
 
   val INVALID_MOVE: Int = -1
 
@@ -27,13 +28,9 @@ abstract class Piece {
     value
   }
 
-  def getPieceType(): PieceType = {
-    PieceType.ANY
-  }
+  def getPieceType(): PieceType
 
-  def getPieceCode(): Int = {
-    0
-  }
+  def getPieceCode(): Int
 
   def getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
     var result: List[Int] = List()
@@ -44,7 +41,7 @@ abstract class Piece {
   def getAllMoves(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int], attackedByEnemy: List[Int] = List()): List[Move] = {
     val result: List[Int] = getAttackedFields(from,occupiedByEnemy,occupiedByOwn)
 
-    result.filter( !isOccupiedByOwn(_, occupiedByOwn)).map(x => new Move(from,x,getPieceType(),getPieceType()))
+    result.filter( !OccupationChecker.isOccupiedByOwn(_, occupiedByOwn)).map(x => new Move(from,x,getPieceType(),getPieceType()))
   }
 
   def moveUntilStop(currentField: Int, direction: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
@@ -52,36 +49,15 @@ abstract class Piece {
     val row = currentField % 8
     val vDir = direction / MOVE_MATRIX_SIZE - 1
     val hDir = direction % MOVE_MATRIX_SIZE - 1
-    if( isValidMove(line + vDir, row+hDir)){
+    if( MoveValidator.isValidMove(line + vDir, row+hDir)){
       val destField = (line+vDir)*8+row+hDir
-      if( isOccupiedByEnemy(destField,occupiedByEnemy) || isOccupiedByOwn(destField,occupiedByOwn)) {
+      if( OccupationChecker.isOccupiedByEnemy(destField,occupiedByEnemy) || OccupationChecker.isOccupiedByOwn(destField,occupiedByOwn)) {
         destField :: Nil
       } else {
         destField :: moveUntilStop(destField,direction,occupiedByEnemy,occupiedByOwn)
       }
     }
     else Nil
-  }
-
-  def isOccupiedByOwn( x: Int, occupiedByOwn: List[Int]): Boolean = {
-    occupiedByOwn.contains(x)
-  }
-
-  def isOccupiedByEnemy( x: Int, occupiedByEnemy: List[Int]): Boolean = {
-    occupiedByEnemy.contains(x)
-  }
-
-  def isOccupiedBy(field : Int, occupied: List[Int]): Boolean = occupied match {
-    case Nil => false
-    case y :: ys => y == field || isOccupiedBy( field, ys)
-  }
-
-  protected def isValidMove( line: Int, row: Int): Boolean = {
-    ( line < 8 ) && ( line  >= 0 ) && ( row < 8 ) && ( row >= 0 )
-  }
-
-  protected def isValidMove( to : Int): Boolean = {
-    ( (to % 8) < 8 ) && ( (to % 8)  >= 0 ) && ( (to / 8 )< 8 ) && ( (to /8)  >= 0 )
   }
 
 }

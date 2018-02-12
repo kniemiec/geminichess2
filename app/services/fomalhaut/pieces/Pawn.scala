@@ -1,5 +1,6 @@
 package services.fomalhaut.pieces
 
+import services.fomalhaut.fieldAvailability.{MoveValidator, OccupationChecker}
 import services.fomalhaut.pieces.PieceType.PieceType
 import services.fomalhaut.{BoardSpecialEvents, Move}
 
@@ -59,19 +60,7 @@ case class Pawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEvents) e
     PieceType.PAWN
   }
 
-
-
   override def getPieceCode(): Int = 80
-
-//  override def old_getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
-//    val dynamicMovePattern: List[Int] = getDynamicMovePattern(from / 8)
-//    val listOfAttackedMoves = getNormalMoves(from,occupiedByEnemy,occupiedByOwn,dynamicMovePattern) :::
-//      getLeftAttack(from,occupiedByEnemy) :::
-//      getRightAttack(from,occupiedByEnemy)
-//
-//    if(listOfAttackedMoves.nonEmpty) listOfAttackedMoves.map(popuplateWithPromotionMoves(_)).reduceLeft((A:List[Int],B:List[Int])=>(A ::: B))
-//    else Nil
-//  }
 
   override def getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
     List(calculateMove(from,getLeftAttackPattern()),calculateMove(from,getRightAttackPattern())).
@@ -124,14 +113,14 @@ case class Pawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEvents) e
   private def getLeftAttack(from: Int,occupiedByEnemy: List[Int]): List[Int] = {
     val dir = getLeftAttackPattern()
     val destMove = calculateMove(from,dir)
-    if(destMove != INVALID_MOVE && (isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
+    if(destMove != INVALID_MOVE && (OccupationChecker.isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
     else Nil
   }
 
   private def getRightAttack(from: Int,occupiedByEnemy: List[Int]): List[Int] = {
     val dir = getRightAttackPattern()
     val destMove = calculateMove(from,dir)
-    if(destMove != INVALID_MOVE && (isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
+    if(destMove != INVALID_MOVE && (OccupationChecker.isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
     else Nil
   }
 
@@ -155,13 +144,13 @@ case class Pawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEvents) e
 
 
   private def isFreeField(field: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): Boolean = {
-    !isOccupiedBy(field, occupiedByEnemy ::: occupiedByOwn)
+    !OccupationChecker.isOccupiedBy(field, occupiedByEnemy ::: occupiedByOwn)
   }
 
   private def old_calculateMove(from: Int, direction: Int): Int = {
     val newLine = calculateM(from,direction,_/_)
     val newRow = calculateM(from,direction,_%_)
-    if(isValidMove(newLine,newRow)) 8*newLine+newRow
+    if(MoveValidator.isValidMove(newLine,newRow)) 8*newLine+newRow
     else INVALID_MOVE
   }
 
@@ -169,7 +158,7 @@ case class Pawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEvents) e
 
     val newLine = calculateM(from,direction,_/_)
     val newRow = calculateM(from,direction,_%_)
-    if(isValidMove(newLine,newRow)) 8*newLine+newRow
+    if(MoveValidator.isValidMove(newLine,newRow)) 8*newLine+newRow
     else INVALID_MOVE
 //    8 * calculateM(from,direction,_/_) +calculateM(from,direction,_%_)
   }

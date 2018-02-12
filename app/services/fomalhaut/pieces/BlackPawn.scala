@@ -1,5 +1,6 @@
 package services.fomalhaut.pieces
 
+import services.fomalhaut.fieldAvailability.{MoveValidator, OccupationChecker}
 import services.fomalhaut.pieces.PieceType.PieceType
 import services.fomalhaut.{BoardSpecialEvents, Move}
 
@@ -114,14 +115,14 @@ case class BlackPawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEven
   private def getLeftAttack(from: Int,occupiedByEnemy: List[Int]): List[Int] = {
     val dir = getLeftAttackPattern()
     val destMove = calculateMove(from,dir)
-    if(destMove != INVALID_MOVE && (isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
+    if(destMove != INVALID_MOVE && (OccupationChecker.isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
     else Nil
   }
 
   private def getRightAttack(from: Int,occupiedByEnemy: List[Int]): List[Int] = {
     val dir = getRightAttackPattern()
     val destMove = calculateMove(from,dir)
-    if(destMove != INVALID_MOVE && (isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
+    if(destMove != INVALID_MOVE && (OccupationChecker.isOccupiedByEnemy(destMove,occupiedByEnemy) || isEnPassantField(destMove))) List(destMove)
     else Nil
   }
 
@@ -145,13 +146,13 @@ case class BlackPawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEven
 
 
   private def isFreeField(field: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): Boolean = {
-    !isOccupiedBy(field, occupiedByEnemy ::: occupiedByOwn)
+    !OccupationChecker.isOccupiedBy(field, occupiedByEnemy ::: occupiedByOwn)
   }
 
   private def old_calculateMove(from: Int, direction: Int): Int = {
     val newLine = calculateM(from,direction,_/_)
     val newRow = calculateM(from,direction,_%_)
-    if(isValidMove(newLine,newRow)) 8*newLine+newRow
+    if(MoveValidator.isValidMove(newLine,newRow)) 8*newLine+newRow
     else INVALID_MOVE
   }
 
@@ -159,7 +160,7 @@ case class BlackPawn(mPositions: List[Int], boardSpecialEvents: BoardSpecialEven
 
     val newLine = calculateM(from,direction,_/_)
     val newRow = calculateM(from,direction,_%_)
-    if(isValidMove(newLine,newRow)) 8*newLine+newRow
+    if(MoveValidator.isValidMove(newLine,newRow)) 8*newLine+newRow
     else INVALID_MOVE
 //    8 * calculateM(from,direction,_/_) +calculateM(from,direction,_%_)
   }

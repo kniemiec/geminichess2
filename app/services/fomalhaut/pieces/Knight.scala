@@ -1,5 +1,6 @@
 package services.fomalhaut.pieces
 
+import services.fomalhaut.fieldAvailability.{MoveValidator, OccupationChecker}
 import services.fomalhaut.pieces.PieceType.PieceType
 import services.fomalhaut.{BoardSpecialEvents, Move}
 
@@ -22,18 +23,18 @@ case class Knight(mPositions: List[Int], boardContext: BoardSpecialEvents) exten
   override def getPieceCode(): Int = 78
 
   override def getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
-    for(direction <- movePattern if isValidMove(calculateMoveY(from,direction),calculateMoveX(from,direction)))
+    for(direction <- movePattern if MoveValidator.isValidMove(calculateMoveY(from,direction),calculateMoveX(from,direction)))
       yield 8*calculateMoveY(from,direction)+calculateMoveX(from,direction)
   }
 
   override def getAllMoves(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int], attackedByEnemy: List[Int]): List[Move] = {
     getAttackedFields(from,occupiedByEnemy,occupiedByOwn)
-      .filter((to: Int) => isValidKnightMove(to, occupiedByOwn))
+      .filter((to: Int) => _isValidKnightMove(to, occupiedByOwn))
       .map{ to => new Move(from,to,getPieceType(),getPieceType())}
   }
 
-   def isValidKnightMove( to : Int,  occupiedByOwn: List[Int]): Boolean = {
-     !isOccupiedByOwn(to , occupiedByOwn )
+   def _isValidKnightMove(to : Int, occupiedByOwn: List[Int]): Boolean = {
+     !OccupationChecker.isOccupiedByOwn(to , occupiedByOwn )
    }
 
   def calculateMoveX(from: Int, direction: Int): Int = {

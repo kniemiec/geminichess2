@@ -1,5 +1,6 @@
 package services.fomalhaut.pieces
 
+import services.fomalhaut.fieldAvailability.{MoveValidator, OccupationChecker}
 import services.fomalhaut.pieces.PieceType.PieceType
 import services.fomalhaut.{BoardSpecialEvents, Move}
 
@@ -40,16 +41,9 @@ case class King(mPositions: List[Int], boardContext: BoardSpecialEvents) extends
   val WHITE_KING_POSITION = 4
   val BLACK_KING_POSITION = 60
 
-//  override def old_getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): List[Int] = {
-//    var result: List[Int] = List()
-//    for (direction <- movePattern if isValidKingMove(from, direction, occupiedByEnemy, occupiedByOwn)
-//    ) result = 8 * calculateMoveY(from, direction) + calculateMoveX(from, direction) :: result
-//    result = result ::: getCastlingMoves(from, occupiedByEnemy, occupiedByOwn)
-//    result
-//  }
 
    override def getAttackedFields(from: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]= List()): List[Int] = {
-    for(direction <- movePattern if isValidMove(calculateMoveY(from,direction),calculateMoveX(from,direction)))
+    for(direction <- movePattern if MoveValidator.isValidMove(calculateMoveY(from,direction),calculateMoveX(from,direction)))
       yield 8*calculateMoveY(from,direction)+calculateMoveX(from,direction)
   }
 
@@ -149,15 +143,15 @@ case class King(mPositions: List[Int], boardContext: BoardSpecialEvents) extends
   }
 
   private def isFieldFree(field: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int]): Boolean = {
-    !isOccupiedByOwn(field, occupiedByOwn ) && !isOccupiedByEnemy(field, occupiedByEnemy)
+    !OccupationChecker.isOccupiedByOwn(field, occupiedByOwn ) && !OccupationChecker.isOccupiedByEnemy(field, occupiedByEnemy)
   }
 
   private def isCastlingElligible(field: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int],listOfAttackedFields: List[Int]): Boolean = {
-    !isOccupiedByOwn(field, occupiedByOwn ) && !isOccupiedByEnemy(field, occupiedByEnemy) && isFieldNotAttacked(field,listOfAttackedFields)
+    !OccupationChecker.isOccupiedByOwn(field, occupiedByOwn ) && !OccupationChecker.isOccupiedByEnemy(field, occupiedByEnemy) && isFieldNotAttacked(field,listOfAttackedFields)
   }
 
   def isValidKingMove( to: Int, occupiedByEnemy: List[Int], occupiedByOwn: List[Int], listOfAttackedFields: List[Int]): Boolean = {
-    !isOccupiedByOwn(to , occupiedByOwn ) && isFieldNotAttacked(to,listOfAttackedFields)
+    !OccupationChecker.isOccupiedByOwn(to , occupiedByOwn ) && isFieldNotAttacked(to,listOfAttackedFields)
   }
 
     def calculateMoveX(from: Int, direction: Int): Int = {
